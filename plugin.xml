@@ -49,6 +49,12 @@
         <config-file target="config.xml" parent="/*">
             <preference name="bluetooth_restore_state" value="$BLUETOOTH_RESTORE_STATE"/>
         </config-file>
+
+        <config-file target="*-Info.plist" parent="UIBackgroundModes">
+            <array>
+              <string>bluetooth-central</string>
+            </array>
+        </config-file>
     </platform>
 
     <platform name="android">
