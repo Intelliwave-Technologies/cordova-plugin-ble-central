@@ -1170,9 +1170,31 @@ public class BLECentralPlugin extends CordovaPlugin {
             }
         }
 
+        // Returns data to same callback except as array of ScanResults.
+        // Only called when reportDelay > 0 or scanMode == LOW_POWER.
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
             super.onBatchScanResults(results);
+
+			JSONArray batchPeripherals = new JSONArray();
+			for (ScanResult result : results) {
+				BluetoothDevice device = result.getDevice();
+				String address = device.getAddress();
+
+				Boolean isConnectable = null;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+					isConnectable = result.isConnectable();
+				}
+
+				Peripheral peripheral = new Peripheral(device, result.getRssi(), result.getScanRecord().getBytes(), isConnectable);
+				batchPeripherals.put(peripheral.asJSONObject());
+			}
+
+			if (reportDuplicates && discoverCallback != null) {
+				PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, batchPeripherals);
+				pluginResult.setKeepCallback(true);
+				discoverCallback.sendPluginResult(pluginResult);
+			}
         }
 
         @Override
