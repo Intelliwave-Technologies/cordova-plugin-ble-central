@@ -47,6 +47,8 @@ declare namespace BLECentralPlugin {
         reportDelay?: number;
         /* Android only */
         forceScanFilter?: number;
+        /* Android only */
+        serviceDataUUIDs?: string[];
 
         reportDuplicates?: boolean;
         /** Scanning duration in seconds */

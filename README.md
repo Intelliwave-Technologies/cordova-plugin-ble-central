@@ -297,6 +297,7 @@ See the [location permission notes](#location-permission-notes) above for inform
         Can be one of: _1m_ | _coded_ | _all_
     -   _legacy_: _true_ or _false_ to [control filtering](https://developer.android.com/reference/kotlin/android/bluetooth/le/ScanSettings.Builder#setlegacy) bluetooth spec.pre-4.2 advertisements on Android.
     -   _forceScanFilter_: _true_ or _false_ to [to force an empty scan filter](https://github.com/don/cordova-plugin-ble-central/issues/987) if no other filters are provided on Android.
+    -   _serviceDataUUIDs_: Array of UUID strings. Adds a [setServiceData()](https://developer.android.com/reference/android/bluetooth/le/ScanFilter.Builder#setServiceData(android.os.ParcelUuid,%20byte[])) scan filter per UUID on Android, matching devices that advertise service data for that UUID even without a service UUID list (e.g. Eddystone frames without the _FEAA_ list). Filters are combined with the _services_ filters.
     -   _reportDelay_: Milliseconds for [setReportDelay()](https://developer.android.com/reference/kotlin/android/bluetooth/le/ScanSettings.Builder#setreportdelay) on Android. _0_ to be notified of results immediately. Values > _0_ causes the scan results to be queued up and delivered after the requested delay or when the internal buffers fill up.
 -   **success**: Success callback function that is invoked which each discovered device.
 -   **failure**: Error callback function, invoked when error occurs. [optional]
