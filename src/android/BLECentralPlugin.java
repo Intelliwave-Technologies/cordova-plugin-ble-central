@@ -128,6 +128,7 @@ public class BLECentralPlugin extends CordovaPlugin {
     // scan options
     boolean reportDuplicates = false;
     boolean forceScanFilter = false;
+    UUID[] serviceDataUUIDs = null;
 
     private static final int REQUEST_BLUETOOTH_SCAN = 2;
     private static final int REQUEST_BLUETOOTH_CONNECT = 3;
@@ -412,6 +413,10 @@ public class BLECentralPlugin extends CordovaPlugin {
             resetScanOptions();
             this.reportDuplicates = options.optBoolean("reportDuplicates", false);
             this.forceScanFilter = options.optBoolean("forceScanFilter", false);
+            JSONArray serviceDataUUIDs = options.optJSONArray("serviceDataUUIDs");
+            if (serviceDataUUIDs != null) {
+                this.serviceDataUUIDs = parseServiceUUIDList(serviceDataUUIDs);
+            }
             ScanSettings.Builder scanSettings = new ScanSettings.Builder();
 
             switch (options.optString("scanMode", "")) {
@@ -1286,7 +1291,19 @@ public class BLECentralPlugin extends CordovaPlugin {
                         new ParcelUuid(uuid)).build();
                 filters.add(filter);
             }
-        } else if (this.forceScanFilter) {
+        }
+
+        // Service UUID filters only match the advertised service UUID list, so devices that only
+        // advertise service data for a UUID need a service data filter. Empty data matches any payload.
+        if (this.serviceDataUUIDs != null && this.serviceDataUUIDs.length > 0) {
+            for (UUID uuid : this.serviceDataUUIDs) {
+                ScanFilter filter = new ScanFilter.Builder().setServiceData(
+                        new ParcelUuid(uuid), new byte[0]).build();
+                filters.add(filter);
+            }
+        }
+
+        if (filters.isEmpty() && this.forceScanFilter) {
             ScanFilter filter = new ScanFilter.Builder().build();
             filters.add(filter);
         }
@@ -1487,6 +1504,7 @@ public class BLECentralPlugin extends CordovaPlugin {
     private void resetScanOptions() {
         this.reportDuplicates = false;
         this.forceScanFilter = false;
+        this.serviceDataUUIDs = null;
     }
 
     private void addBondStateListener() {
